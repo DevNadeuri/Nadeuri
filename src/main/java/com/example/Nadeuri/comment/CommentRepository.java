@@ -6,10 +6,10 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
-    // 특정 게시글에 달린 모든 댓글 조회
-    List<CommentEntity> findByBoard_Id(Long boardId);
+    // 특정 게시글 조회
+    List<CommentEntity> Board_Id(Long boardId);
 
-    // 특정 유저의 모든 댓글 조회 - userId
-    List<CommentEntity> findByMember_UserId(String userId);
+    // 특정 유저의 모든 댓글 조회
+    List<CommentEntity> Member_UserId(String userId);
 
 }

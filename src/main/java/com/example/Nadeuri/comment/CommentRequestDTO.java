@@ -13,16 +13,19 @@ public class CommentRequestDTO {
     @NotNull(message = "게시글 ID는 필수입니다.")
     private Long boardId;
 
-    @NotNull(message = "회원 ID는 필수입니다.")
-    private Long memberId;
+    @NotBlank(message = "회원 ID는 필수입니다.")
+    private String userId;
 
     @NotBlank(message = "댓글 내용은 필수입니다.")
     private String content;
 
+    private Long parentCommentId; // 부모 댓글 ID (답글인 경우)
+
     @Builder
-    public CommentRequestDTO(Long boardId, Long memberId, String content) {
+    public CommentRequestDTO(Long boardId, String userId, String content, Long parentCommentId) {
         this.boardId = boardId;
-        this.memberId = memberId;
+        this.userId = userId;
         this.content = content;
+        this.parentCommentId = parentCommentId;
     }
 }

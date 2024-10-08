@@ -6,12 +6,12 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -36,6 +36,13 @@ public class CommentEntity {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_no")
+    private CommentEntity parentComment;
+
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentEntity> replies;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -45,11 +52,12 @@ public class CommentEntity {
     private LocalDateTime updatedAt;
 
     @Builder
-    public CommentEntity(Long id, BoardEntity board, MemberEntity member, String content) {
+    public CommentEntity(Long id, BoardEntity board, MemberEntity member, String content, CommentEntity parentComment) {
         this.id = id;
         this.board = board;
         this.member = member;
         this.content = content;
+        this.parentComment = parentComment;
     }
 
     // content 업데이트 메서드

@@ -19,7 +19,7 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    // 댓글 생성 - 일반 사용자만 댓글 생성 가능
+    // 댓글 생성 - 부모 댓글이 있을 경우 해당 정보도 함께 처리
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CommentDTO> createComment(
@@ -27,18 +27,19 @@ public class CommentController {
             @AuthenticationPrincipal CustomUserPrincipal user) {
         String userId = extractUserId(user);
 
-        // 새로운 댓글 생성
+        // 새로운 댓글 또는 답글 생성
         CommentDTO newComment = CommentDTO.builder()
                 .memberId(userId)
                 .boardId(commentRequestDTO.getBoardId())
                 .content(commentRequestDTO.getContent())
+                .parentCommentId(commentRequestDTO.getParentCommentId())
                 .build();
 
         CommentDTO createdComment = commentService.createComment(newComment);
         return ResponseEntity.ok(createdComment);
     }
 
-    // 게시글에 달린 모든 댓글 조회 - 누구나 조회 가능
+    // 게시글에 달린 모든 댓글 조회 - 계층형 구조로 조회
     @GetMapping("/board/{boardId}")
     public ResponseEntity<List<CommentDTO>> readBoard(
             @PathVariable Long boardId) {
@@ -81,6 +82,6 @@ public class CommentController {
 
     // 사용자 ID 추출 메서드
     private String extractUserId(CustomUserPrincipal user) {
-        return user.getName();  // 사용자 이름을 추출하여 반환
+        return user.getName();
     }
 }
