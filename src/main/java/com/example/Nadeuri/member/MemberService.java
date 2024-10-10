@@ -116,4 +116,10 @@ public class MemberService {
         return member; // MemberEntity를 MemberDTO로 변환하여 반환
     }
 
+    public MemberEntity findByUserId(String userId) {
+        MemberEntity member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("UserId not found: " + userId));
+        return member; // MemberEntity를 MemberDTO로 변환하여 반환
+    }
+
 }

@@ -6,6 +6,7 @@ import com.example.Nadeuri.member.security.auth.CustomUserPrincipal;
 import com.example.Nadeuri.member.security.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -47,9 +48,51 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             //토큰 발급 관련 경로는 제외
             return true;
         }
-        if(!request.getRequestURI().startsWith("/v1/")) {   //application.properties에서 static설정도 추가해줘야함
+
+        if (request.getRequestURI().startsWith("/members/sign-up")) {
+            //토큰 발급 관련 경로는 제외
             return true;
         }
+
+        if (request.getRequestURI().startsWith("/members/login")) {
+            //토큰 발급 관련 경로는 제외
+            return true;
+        }
+
+        if (request.getRequestURI().startsWith("/boards/list")) {
+            //토큰 발급 관련 경로는 제외
+            return true;
+        }
+
+        if (request.getRequestURI().startsWith("/img/")) {
+            //토큰 발급 관련 경로는 제외
+            return true;
+        }
+
+        if (request.getRequestURI().startsWith("/oauthlogin")) {
+            //토큰 발급 관련 경로는 제외
+            return true;
+        }
+
+        if (request.getRequestURI().startsWith("/success")) {
+            //토큰 발급 관련 경로는 제외
+            return true;
+        }
+
+        // /v1/boards는 토큰이 없어도 접근 가능
+        if ("/v1/boards".equals(request.getRequestURI())) {
+            return true;
+        }
+
+        // /v1/boards는 토큰이 없어도 접근 가능
+        if ("/boards/".equals(request.getRequestURI())) {
+            return true;
+        }
+
+
+//        if(!request.getRequestURI().startsWith("/v1/")) {   //application.properties에서 static설정도 추가해줘야함
+//            return true;
+//        }
 
         return false;    //그 외 모든 경로는 필터링 false // true 모든 경로 허용
     }
@@ -59,6 +102,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         log.info("--- doFilterInternal() ");
         log.info("--- requestURI : " + request.getRequestURI());
 
+        // Authorization 헤더에서 액세스 토큰 읽기
         String headerAuth = request.getHeader("Authorization");
         log.info("--- headerAuth : " + headerAuth);
 
@@ -67,6 +111,26 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             handleException(response, new Exception("ACCESS TOKEN NOT FOUND"));
             return;
         }
+
+//        -----쿠키에 토큰값을 저장하였으므로 쿠키에서 토큰값을 가져와야한다.-----
+//        String accessToken = null;
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies != null) {
+//            for (Cookie cookie : cookies) {
+//                if (cookie.getName().equals("accessToken")) {
+//                    accessToken = cookie.getValue();
+//                    break;
+//                }
+//            }
+//        }
+//
+//        log.info("--- accessToken : " + accessToken);
+//
+//        // 액세스 토큰이 없으면 403 예외 발생
+//        if (accessToken == null) {
+//            handleException(response, new Exception("ACCESS TOKEN NOT FOUND"));
+//            return;
+//        }
 
         //토큰 유효성 검증 -----------------------------------------------
         String accessToken = headerAuth.substring(7);  //"Bearer " 를 제외하고 토큰값 저장

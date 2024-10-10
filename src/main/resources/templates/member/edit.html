@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원정보 수정</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>회원정보 수정</h2>
+    <form th:action="@{/members/{userId}(userId=${member.userId})}" method="post" enctype="multipart/form-data">
+        <!-- 숨겨진 필드로 PUT 메서드 처리 -->
+        <input type="hidden" name="_method" value="put" />
+
+        <!-- 비밀번호 수정 -->
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" class="form-control" id="password" name="password" th:value="${member.password}" required>
+        </div>
+
+        <!-- 이름 수정 -->
+        <div class="form-group">
+            <label for="name">이름</label>
+            <input type="text" class="form-control" id="name" name="name" th:value="${member.name}" required>
+        </div>
+
+        <!-- 이메일 수정 -->
+        <div class="form-group">
+            <label for="email">이메일</label>
+            <input type="email" class="form-control" id="email" name="email" th:value="${member.email}" required>
+        </div>
+
+        <!-- 역할 수정 -->
+        <div class="form-group">
+            <label for="role">역할</label>
+            <select class="form-control" id="role" name="role">
+                <option th:selected="${member.role == 'USER'}" value="USER">USER</option>
+                <option th:selected="${member.role == 'ADMIN'}" value="ADMIN">ADMIN</option>
+            </select>
+        </div>
+
+        <!-- 닉네임 수정 -->
+        <div class="form-group">
+            <label for="nickname">닉네임</label>
+            <input type="text" class="form-control" id="nickname" name="nickname" th:value="${member.nickname}" required>
+        </div>
+
+        <!-- 프로필 이미지 수정 -->
+        <div class="form-group">
+            <label for="profileImage">프로필 이미지</label>
+            <input type="file" class="form-control-file" id="profileImage" name="profileImage">
+            <img th:src="@{${member.profileImage}}" alt="Profile Image" class="img-fluid mt-3" style="max-width: 200px;">
+        </div>
+
+        <!-- 생년월일 확인 (수정 불가) -->
+        <div class="form-group">
+            <label for="birthDate">생년월일</label>
+            <p id="birthDate" class="form-control-plaintext" th:text="${member.birthDate}"></p>
+        </div>
+
+        <button type="submit" class="btn btn-primary">수정하기</button>
+    </form>
+
+    <!-- 성공 메시지 -->
+    <div th:if="${message}" class="alert alert-success mt-3" role="alert">
+        <span th:text="${message}"></span>
+    </div>
+
+    <!-- 오류 메시지 -->
+    <div th:if="${errorMessage}" class="alert alert-danger mt-3" role="alert">
+        <span th:text="${errorMessage}"></span>
+    </div>
+</div>
+</body>
+</html>

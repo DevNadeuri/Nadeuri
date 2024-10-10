@@ -6,7 +6,9 @@ import com.example.Nadeuri.member.dto.MemberDTO;
 import com.example.Nadeuri.member.dto.request.MemberUpdateRequest;
 import com.example.Nadeuri.member.dto.request.SignupDTO;
 import com.example.Nadeuri.member.exception.MemberException;
+import com.example.Nadeuri.member.security.util.CookieUtil;
 import com.example.Nadeuri.member.security.util.JWTUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -41,7 +43,7 @@ public class MemberController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String,String>> login(@RequestBody MemberDTO memberDTO) {
+    public ResponseEntity<Map<String,String>> login(@RequestBody MemberDTO memberDTO, HttpServletResponse response) {
         MemberEntity member = memberRepository.findByUserId(memberDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 Id 입니다."));
         if (!passwordEncoder.matches(memberDTO.getPassword(), member.getPassword())) {
@@ -57,8 +59,13 @@ public class MemberController {
         String refreshToken = jwtUtil.createToken(Map.of("userId", foundMemberDTO.getUserId()),
                 60 * 24 * 7);                   //7일 유효
 
+        // 쿠키에 토큰 저장
+        CookieUtil.addCookie(response, "accessToken", accessToken, 3600); // 1시간
+        CookieUtil.addCookie(response, "refreshToken", refreshToken, 604800); // 7일
+
         log.info("--- accessToken : " + accessToken);
         log.info("--- refreshToken : " + refreshToken);
+
 
         return ResponseEntity.ok(Map.of("accessToken", accessToken, "refreshToken", refreshToken));
     }
@@ -96,4 +103,10 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<MemberDTO>> getCurrentUser(Authentication authentication) {
+        String userId = authentication.getName(); // 인증된 사용자 ID 가져오기
+        MemberDTO memberDTO = new MemberDTO(memberService.findByUserId(userId)); // 사용자 정보 조회
+        return ResponseEntity.ok(ApiResponse.success(memberDTO)); // 사용자 정보를 포함한 ApiResponse 반환
+    }
 }

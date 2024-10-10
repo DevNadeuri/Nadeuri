@@ -41,7 +41,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
         MemberEntity member = memberRepository.findByEmail(email)
                 .map(entity -> {
                     entity.changeEmail(email);
-                    entity.changeEmail(profileImageUrl); // 기존 사용자 정보 업데이트
+                    entity.changeProfileImage(profileImageUrl); // 기존 사용자 정보 업데이트
                     entity.changeName(name);
                     return entity; // 변경된 엔티티 반환
                 })
